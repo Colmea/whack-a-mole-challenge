@@ -1,7 +1,10 @@
 import Phaser from "phaser";
 import CONFIG from '../config';
+import GameManager from "../services/GameManager";
 
 export default class BootstrapScene extends Phaser.Scene {
+  private gameManager: GameManager;
+
   constructor() {
     super("Bootstrap");
   }
@@ -14,6 +17,13 @@ export default class BootstrapScene extends Phaser.Scene {
   }
 
   create() {
-    console.log('start', CONFIG);
+    const bgAsset = this.add.image(CONFIG.GAME_WIDTH/2, CONFIG.GAME_HEIGHT/2, 'background');
+    bgAsset.setDisplaySize(CONFIG.GAME_WIDTH, CONFIG.GAME_HEIGHT)
+
+    this.gameManager = new GameManager(this);
+  }
+
+  update() {
+    this.gameManager.update();
   }
 }
