@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import CONFIG from './config';
-import BootstrapScene from "./scenes/BootstrapScene";
+import BootstrapScene from "./scenes/BootScene";
+import GameScene from "./scenes/GameScene";
+import HUDScene from "./scenes/HUDScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.WEBGL,
@@ -14,6 +16,8 @@ const config: Phaser.Types.Core.GameConfig = {
   height: CONFIG.GAME_HEIGHT,
   scene: [
     BootstrapScene,
+    GameScene,
+    HUDScene,
   ]
 };
 

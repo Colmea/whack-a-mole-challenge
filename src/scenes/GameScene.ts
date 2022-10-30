@@ -5,31 +5,38 @@ import Hammer from '../components/Hammer';
 import { IWhackable } from '../types/IWhackable';
 import { Tag } from '../types/Tag';
 
-export default class GameManager extends Phaser.GameObjects.Container {
+export default class GameScene extends Phaser.Scene {
   private static readonly MIN_SPAWN_FREQUENCY: number = 500;
   private static readonly MAX_SPAWN_FREQUENCY: number = 3000;
   private static readonly GAME_TIMER: number = 1200000; // 2min
 
   score: number = 0;
-  startTime: Date = new Date();
+  remainingTime: number = 120;
 
   private isStarted: boolean = false;
   private hammer: Hammer;
   private moles: Mole[];
 
-  constructor(readonly scene: Phaser.Scene) {
-    super(scene, CONFIG.GAME_WIDTH/2, CONFIG.GAME_HEIGHT/2);
+  constructor() {
+    super({ key: 'GameScene', active: false });
+  }
+
+  create() {
+    console.log('Init GameScene');
+
+    this.registry.set('score', this.score);
+    this.registry.set('remainingTime', this.remainingTime);
 
     // @TODO Find better way to position moles
     this.moles = [
-      new Mole(scene, CONFIG.GAME_WIDTH/3, CONFIG.GAME_HEIGHT/3),
-      new Mole(scene, CONFIG.GAME_WIDTH/2, CONFIG.GAME_HEIGHT/3),
-      new Mole(scene, CONFIG.GAME_WIDTH/1.5, CONFIG.GAME_HEIGHT/3),
+      new Mole(this, CONFIG.GAME_WIDTH/3, CONFIG.GAME_HEIGHT/3),
+      new Mole(this, CONFIG.GAME_WIDTH/2, CONFIG.GAME_HEIGHT/3),
+      new Mole(this, CONFIG.GAME_WIDTH/1.5, CONFIG.GAME_HEIGHT/3),
     ];
 
-    this.hammer = new Hammer(this.scene, CONFIG.GAME_WIDTH/2, CONFIG.GAME_HEIGHT/2);
+    this.hammer = new Hammer(this, CONFIG.GAME_WIDTH/2, CONFIG.GAME_HEIGHT/2);
 
-    this.scene.input
+    this.input
     .setTopOnly(false)
     .on('pointerdown', (pointer: Phaser.Input.Pointer, objectsClicked: IWhackable[]) => {
         objectsClicked.forEach(object => {
@@ -40,6 +47,8 @@ export default class GameManager extends Phaser.GameObjects.Container {
         })
       }
     );
+
+    this.scene.launch('HUDScene');
   }
 
   update() {
@@ -52,7 +61,7 @@ export default class GameManager extends Phaser.GameObjects.Container {
   }
 
   increaseScore() {
-    console.log('increase score');
     this.score += CONFIG.SCORE_MOLE;
+    this.registry.set('score', this.score);
   } 
 }
