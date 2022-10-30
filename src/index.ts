@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import CONFIG from "./config";
 import BoardScene from "./scenes/BoardScene";
-import BootstrapScene from "./scenes/BootScene";
+import ManagerScene from "./scenes/ManagerScene";
 import GameScene from "./scenes/GameScene";
 import HUDScene from "./scenes/HUDScene";
 
@@ -15,7 +15,7 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   width: CONFIG.GAME_WIDTH,
   height: CONFIG.GAME_HEIGHT,
-  scene: [BootstrapScene, BoardScene, GameScene, HUDScene],
+  scene: [ManagerScene, BoardScene, GameScene, HUDScene],
 };
 
 const game = new Phaser.Game(config);

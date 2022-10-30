@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import CONFIG from "../config";
 import floatingTween from "../tweens/FloatingTween";
+import pulseTween from "../tweens/PulseTween";
 
 type HUDData = {
   score: number;
@@ -71,7 +72,10 @@ export default class HUDScene extends Phaser.Scene {
 
     const timeHud = this.add.image(0, 0, "time_hud");
     this.remainingTimeText = this.add
-      .text(0, -10, "120", { ...textOptions, font: "60px Arial Black" })
+      .text(0, -10, CONFIG.GAME.TIMER.toString(), {
+        ...textOptions,
+        font: "60px Arial Black",
+      })
       .setOrigin(0.5)
       .setDepth(1000);
 
@@ -80,16 +84,22 @@ export default class HUDScene extends Phaser.Scene {
     this.remainingTimeContainer.setScale(0.8);
 
     this.tweens.timeline(floatingTween(this.remainingTimeContainer));
+    this.tweens.timeline(pulseTween(this.remainingTimeText));
 
     // Register for timer updates
     this.registry.events.on("changedata-remainingTime", this.updateTimer);
   }
 
-  updateScore = (parent: any, value: number) => {
-    this.scoreText.setText(value.toString());
+  updateScore = (parent: any, value: string) => {
+    if (this.scene.isActive("HUDScene")) {
+      this.scoreText.setText(value);
+      this.tweens.timeline(pulseTween(this.scoreText, 0, 0, 100));
+    }
   };
 
   updateTimer = (parent: any, value: number) => {
-    this.remainingTimeText.setText(value.toString());
+    if (this.scene.isActive("HUDScene")) {
+      this.remainingTimeText.setText(value.toString());
+    }
   };
 }

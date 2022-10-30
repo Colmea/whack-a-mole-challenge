@@ -6,12 +6,8 @@ import { IWhackable } from "../types/IWhackable";
 import { Tag } from "../types/Tag";
 
 export default class GameScene extends Phaser.Scene {
-  private static readonly MIN_SPAWN_FREQUENCY: number = 500;
-  private static readonly MAX_SPAWN_FREQUENCY: number = 3000;
-  private static readonly GAME_TIMER: number = 1200000; // 2min
-
   score: number = 0;
-  remainingTime: number = 120;
+  remainingTime: number = CONFIG.GAME.TIMER;
 
   private isStarted: boolean = false;
   private hammer: Hammer;
@@ -25,6 +21,7 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     console.log("Init GameScene");
+    this.scene.launch("HUDScene");
 
     this.registry.set("score", this.score);
     this.registry.set("remainingTime", this.remainingTime);
@@ -67,8 +64,6 @@ export default class GameScene extends Phaser.Scene {
         }
       );
 
-    this.scene.launch("HUDScene");
-
     this.time.addEvent({
       delay: 1000, // ms
       callback: () => {
@@ -79,9 +74,16 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
+  resetGame() {
+    this.score = 0;
+    this.remainingTime = CONFIG.GAME.TIMER;
+    this.registry.set("score", this.score);
+    this.registry.set("remainingTime", this.remainingTime);
+  }
+
   update() {
     // @TODO Refactor with a real RandomSpawner
-    const number = Math.floor(Math.random() * 200);
+    const number = Math.floor(Math.random() * 100);
     if (number === 1) {
       const mole = this.moles[Math.floor(Math.random() * this.moles.length)];
 
@@ -93,7 +95,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   increaseScore() {
-    this.score += CONFIG.SCORE_MOLE;
+    this.score += CONFIG.GAME.MOLE_SCORE;
     this.registry.set("score", this.score);
   }
 }

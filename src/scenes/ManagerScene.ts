@@ -1,11 +1,17 @@
 import Phaser from "phaser";
 import CONFIG from "../config";
 
-export default class BootScene extends Phaser.Scene {
+type LeaderBoardScore = {
+  name: string;
+  score: number;
+};
+
+export default class ManagerScene extends Phaser.Scene {
   private bgMusic: any;
+  private leaderBoard: LeaderBoardScore[] = [];
 
   constructor() {
-    super("BootScene");
+    super("ManagerScene");
   }
 
   preload() {
@@ -20,7 +26,8 @@ export default class BootScene extends Phaser.Scene {
   }
 
   create() {
-    console.log("Init Bootstrap Scene");
+    console.log("Init Manager Scene");
+
     const bgAsset = this.add.image(
       CONFIG.GAME_WIDTH / 2,
       CONFIG.GAME_HEIGHT / 2,
@@ -32,9 +39,19 @@ export default class BootScene extends Phaser.Scene {
 
     this.bgMusic = this.sound.add("music/bg", { loop: true, volume: 0.5 });
     this.bgMusic.play();
+
+    this.registry.events.on("changedata-remainingTime", (parent, value) => {
+      if (value <= 0) {
+        this.gameOver();
+      }
+    });
   }
 
-  update() {
-    // this.gameManager.update();
+  gameOver() {
+    (this.scene.get("GameScene") as any).resetGame();
+
+    this.scene.stop("GameScene");
+    this.scene.stop("HUDScene");
+    this.scene.launch("BoardScene");
   }
 }
