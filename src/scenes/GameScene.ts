@@ -4,16 +4,16 @@ import Mole from "../components/Mole";
 import Hammer from "../components/Hammer";
 import { IWhackable } from "../types/IWhackable";
 import { Tag } from "../types/Tag";
+import SpawnManager from "../services/SpawnManager";
 
 export default class GameScene extends Phaser.Scene {
   score: number = 0;
   remainingTime: number = CONFIG.GAME.TIMER;
 
-  private isStarted: boolean = false;
+  private spawnManager: SpawnManager;
   private hammer: Hammer;
   private moles: Mole[];
   private blopSfx: Phaser.Sound.BaseSound;
-  private punchSfx: Phaser.Sound.BaseSound;
 
   constructor() {
     super({ key: "GameScene", active: false });
@@ -46,6 +46,10 @@ export default class GameScene extends Phaser.Scene {
       new Mole(this, CONFIG.GAME_WIDTH / 1.2, CONFIG.GAME_HEIGHT / 1.5),
     ];
 
+    // Initialize SpawnManager
+    this.spawnManager = new SpawnManager(this, this.moles);
+    this.spawnManager.start();
+
     this.hammer = new Hammer(this, this.input.x, this.input.y);
 
     this.input
@@ -77,21 +81,9 @@ export default class GameScene extends Phaser.Scene {
   resetGame() {
     this.score = 0;
     this.remainingTime = CONFIG.GAME.TIMER;
+    this.spawnManager.stop();
     this.registry.set("score", this.score);
     this.registry.set("remainingTime", this.remainingTime);
-  }
-
-  update() {
-    // @TODO Refactor with a real RandomSpawner
-    const number = Math.floor(Math.random() * 100);
-    if (number === 1) {
-      const mole = this.moles[Math.floor(Math.random() * this.moles.length)];
-
-      if (!mole.isActive) {
-        mole.setUp();
-        this.blopSfx.play();
-      }
-    }
   }
 
   increaseScore() {
