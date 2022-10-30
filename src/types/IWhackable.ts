@@ -1,6 +1,7 @@
 import { Tag } from "./Tag";
 
 export interface IWhackable {
-  tags: Tag[]
+  isActive?: boolean;
+  tags: Tag[];
   onWhack: () => void;
 }

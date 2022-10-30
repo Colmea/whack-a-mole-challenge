@@ -1,63 +1,95 @@
 import Phaser from "phaser";
-import CONFIG from '../config';
+import CONFIG from "../config";
+import floatingTween from "../tweens/FloatingTween";
 
 type HUDData = {
   score: number;
   time: number;
-}
+};
 
-const textOptions: Phaser.Types.GameObjects.Text.TextStyle = { font: '40px Arial Black', color: '#fff', fontStyle: 'bold', shadow: {
-  offsetX: 1,
-  offsetY: 1,
-  color: 'black',
-  blur: 1,
-  stroke: true,
-  fill: true,
-}};
+const textOptions: Phaser.Types.GameObjects.Text.TextStyle = {
+  font: "40px Arial Black",
+  color: "#fff",
+  fontStyle: "bold",
+  shadow: {
+    offsetX: 1,
+    offsetY: 1,
+    color: "black",
+    blur: 1,
+    stroke: true,
+    fill: true,
+  },
+};
 
 export default class HUDScene extends Phaser.Scene {
-
   private score: number = 0;
-  private scoreContainer: Phaser.GameObjects.Image;
+  private scoreContainer: Phaser.GameObjects.Container;
   private scoreText: Phaser.GameObjects.Text;
 
   private remainingTime: number = 120;
-  private remainingTimeContainer: Phaser.GameObjects.Image;
+  private remainingTimeContainer: Phaser.GameObjects.Container;
   private remainingTimeText: Phaser.GameObjects.Text;
- private  dd: Phaser.Types.GameObjects.Text.TextStyle;
+  private dd: Phaser.Types.GameObjects.Text.TextStyle;
   constructor() {
-    super({ key: 'HUDScene', active: false });
+    super({ key: "HUDScene", active: false });
   }
 
   preload() {
-    this.load.image('score_hud', 'assets/ui/score_hud.png');
-    this.load.image('time_hud', 'assets/ui/time_hud.png');
+    this.load.image("score_hud", "assets/ui/score_hud.png");
+    this.load.image("time_hud", "assets/ui/time_hud.png");
   }
 
   create() {
-    console.log('Init UHDScene');
+    console.log("Init UHDScene");
 
-    this.scoreContainer = this.add.image(200, 200, 'score_hud');
-    this.scoreText = this.add.text(200, 230, '0', textOptions).setOrigin(0.5).setDepth(1000);
-
-    // Add remainingTime text
-    this.remainingTimeContainer = this.add.image(1000, 900, 'time_hud');
-    this.remainingTimeText = this.add.text(998, 890, '120', { ...textOptions, font: '60px Arial Black' }).setOrigin(0.5).setDepth(1000);
-
-    this.registry.events.on('changedata', this.updateData);
+    this.createScore();
+    this.createTimer();
   }
 
-  updateData = (parent, key, data) => { 
+  createScore() {
+    // Create score container
+    this.scoreContainer = this.add.container(170, 150);
 
-    switch(key) {
-      case 'score':
-        this.score = data;
-        this.scoreText.setText(this.score.toString());
-        break;
-      case 'remainingTime':
-        this.remainingTime = data;
-        this.remainingTimeText.setText(this.remainingTime.toString());
-        break;
-    }
+    const scoreHud = this.add.image(0, 0, "score_hud");
+    this.scoreText = this.add
+      .text(0, 30, "0", textOptions)
+      .setOrigin(0.5)
+      .setDepth(1000);
+
+    this.scoreContainer.add(scoreHud);
+    this.scoreContainer.add(this.scoreText);
+
+    this.tweens.timeline(floatingTween(this.scoreContainer));
+
+    // Register for score updates
+    this.registry.events.on("changedata-score", this.updateScore);
   }
+
+  createTimer() {
+    // Create timer container
+    this.remainingTimeContainer = this.add.container(1750, 170);
+
+    const timeHud = this.add.image(0, 0, "time_hud");
+    this.remainingTimeText = this.add
+      .text(0, -10, "120", { ...textOptions, font: "60px Arial Black" })
+      .setOrigin(0.5)
+      .setDepth(1000);
+
+    this.remainingTimeContainer.add(timeHud);
+    this.remainingTimeContainer.add(this.remainingTimeText);
+    this.remainingTimeContainer.setScale(0.8);
+
+    this.tweens.timeline(floatingTween(this.remainingTimeContainer));
+
+    // Register for timer updates
+    this.registry.events.on("changedata-remainingTime", this.updateTimer);
+  }
+
+  updateScore = (parent: any, value: number) => {
+    this.scoreText.setText(value.toString());
+  };
+
+  updateTimer = (parent: any, value: number) => {
+    this.remainingTimeText.setText(value.toString());
+  };
 }
