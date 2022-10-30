@@ -27,3 +27,4 @@ npm run serve
 - [ ] Create TweenFactory to help manage tweens
 - [ ] Improve cursor position with hammer (+ hide cursor)
 - [ ] Refactor moles position definition
+- [ ] Add tests

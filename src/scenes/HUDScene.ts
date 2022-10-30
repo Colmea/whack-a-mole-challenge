@@ -8,21 +8,21 @@ type HUDData = {
   time: number;
 };
 
-const textOptions: Phaser.Types.GameObjects.Text.TextStyle = {
-  font: "40px Arial Black",
-  color: "#fff",
-  fontStyle: "bold",
-  shadow: {
-    offsetX: 1,
-    offsetY: 1,
-    color: "black",
-    blur: 1,
-    stroke: true,
-    fill: true,
-  },
-};
-
 export default class HUDScene extends Phaser.Scene {
+  private static TEXT_OPTIONS: Phaser.Types.GameObjects.Text.TextStyle = {
+    font: "40px Arial Black",
+    color: "#fff",
+    fontStyle: "bold",
+    shadow: {
+      offsetX: 1,
+      offsetY: 1,
+      color: "black",
+      blur: 1,
+      stroke: true,
+      fill: true,
+    },
+  };
+
   private score: number = 0;
   private scoreContainer: Phaser.GameObjects.Container;
   private scoreText: Phaser.GameObjects.Text;
@@ -53,7 +53,7 @@ export default class HUDScene extends Phaser.Scene {
 
     const scoreHud = this.add.image(0, 0, "score_hud");
     this.scoreText = this.add
-      .text(0, 30, "0", textOptions)
+      .text(0, 30, "0", HUDScene.TEXT_OPTIONS)
       .setOrigin(0.5)
       .setDepth(1000);
 
@@ -73,7 +73,7 @@ export default class HUDScene extends Phaser.Scene {
     const timeHud = this.add.image(0, 0, "time_hud");
     this.remainingTimeText = this.add
       .text(0, -10, CONFIG.GAME.TIMER.toString(), {
-        ...textOptions,
+        ...HUDScene.TEXT_OPTIONS,
         font: "60px Arial Black",
       })
       .setOrigin(0.5)

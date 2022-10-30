@@ -3,7 +3,7 @@ import CONFIG from "../config";
 import { LeaderBoardScore } from "../types/LeaderBoard";
 
 export default class ManagerScene extends Phaser.Scene {
-  private bgMusic: any;
+  private bgMusic: Phaser.Sound.BaseSound;
   private leaderBoard: LeaderBoardScore[] = [{ name: "Arthur", score: 1325 }];
 
   constructor() {
@@ -25,6 +25,19 @@ export default class ManagerScene extends Phaser.Scene {
   create() {
     console.log("Init Manager Scene");
 
+    this.createDefaultAssets();
+    this.scene.launch("BoardScene");
+
+    // Listen to timer update
+    // Trigger gameOver when timer is over
+    this.registry.events.on("changedata-remainingTime", (parent, value) => {
+      if (value <= 0) {
+        this.gameOver();
+      }
+    });
+  }
+
+  private createDefaultAssets() {
     const bgAsset = this.add.image(
       CONFIG.GAME_WIDTH / 2,
       CONFIG.GAME_HEIGHT / 2,
@@ -32,19 +45,8 @@ export default class ManagerScene extends Phaser.Scene {
     );
     bgAsset.setDisplaySize(CONFIG.GAME_WIDTH, CONFIG.GAME_HEIGHT);
 
-    this.scene.launch("BoardScene");
-
     this.bgMusic = this.sound.add("music/bg", { loop: true, volume: 0.5 });
     this.bgMusic.play();
-
-    // this.registry.set("leaderBoard", this.leaderBoard);
-    // this.registry.set("lastScore", 325);
-
-    this.registry.events.on("changedata-remainingTime", (parent, value) => {
-      if (value <= 0) {
-        this.gameOver();
-      }
-    });
   }
 
   private gameOver() {
@@ -62,6 +64,8 @@ export default class ManagerScene extends Phaser.Scene {
     const newScore: LeaderBoardScore = { name, score };
 
     // Add new score to leaderboard if top 10
+    // We sort the leaderboard in descending order
+    // then slice array to keep top 10
     this.leaderBoard.push(newScore);
     this.leaderBoard.sort((a, b) => b.score - a.score);
     this.leaderBoard = this.leaderBoard.slice(0, CONFIG.GAME.MAX_LEADERBOARD);
