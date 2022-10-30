@@ -10,10 +10,12 @@ export default class SpawnManager {
   private scene: Phaser.Scene;
   private moles: Mole[];
   private timer: Phaser.Time.TimerEvent;
+  private callbackSpawn: () => void;
 
-  constructor(scene: Phaser.Scene, moles: Mole[]) {
+  constructor(scene: Phaser.Scene, moles: Mole[], callbackSpawn: () => void) {
     this.scene = scene;
     this.moles = moles;
+    this.callbackSpawn = callbackSpawn;
   }
 
   public start() {
@@ -32,6 +34,9 @@ export default class SpawnManager {
   private spawnMole() {
     const mole = Phaser.Utils.Array.GetRandom(this.moles);
     mole.setUp();
+
+    this.callbackSpawn();
+
     this.scene.time.addEvent({
       delay: this.getRandomInterval(),
       callback: mole.setDown,

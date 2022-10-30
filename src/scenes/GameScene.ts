@@ -31,7 +31,7 @@ export default class GameScene extends Phaser.Scene {
     this.createMoles();
 
     // Initialize SpawnManager
-    this.spawnManager = new SpawnManager(this, this.moles);
+    this.spawnManager = new SpawnManager(this, this.moles, this.spawnMoleSFX);
 
     this.hammer = new Hammer(this, this.input.x, this.input.y);
 
@@ -76,6 +76,10 @@ export default class GameScene extends Phaser.Scene {
       new Mole(this, CONFIG.GAME_WIDTH / 1.2, CONFIG.GAME_HEIGHT / 1.5),
     ];
   }
+
+  spawnMoleSFX = () => {
+    this.blopSfx.play();
+  };
 
   startGame() {
     // Start SpawnManager
